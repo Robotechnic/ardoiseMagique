@@ -1,3 +1,4 @@
+import math
 class point:
 	def __init__ (self,x,y,taille,couleur):
 		"""définition d'un point"""
@@ -25,6 +26,52 @@ class line:
 		"""dessin"""
 		painter.create_line(self.x1,self.y1,self.x2,self.y2,width=self.taille,fill=self.couleur)
 
+	def colision(self,x,y):
+		"""Verification des colision souris/ligne"""
+		if self.taille < 3:
+			rayon = 3
+		else:
+			rayon = self.taille
+
+		ux = self.x2-self.x1
+		uy = self.y2-self.y1
+
+		acx = x - self.x1
+		acy = y - self.y1
+
+		numerateur = ux*acy - uy*acx
+		numerateur = abs(numerateur)
+
+		denominateur = math.sqrt(ux*ux + uy*uy)
+		CI = numerateur / denominateur
+
+		if CI<rayon:
+			abx = self.x2-self.x1
+			aby = self.y2-self.y1
+			bcx = x - self.x2
+			bcy = y - self.y2
+
+			pscal1 = abx*acx + aby*acy
+			pscal2 = (-abx)*bcx + (-aby)*bcy
+
+			if pscal1>=0 and pscal2>=0:
+				return True
+
+			d2 = (self.x1-x)*(self.x1-x) + (self.y1-y)*(self.y1-y)
+			if not (d2>rayon*rayon):
+				return True
+
+			d2 = (self.x2-x)*(self.x2-x) + (self.y2-y)*(self.y2-y)
+			if not (d2>rayon*rayon):
+				return True
+
+
+		return False
+	def move(self,x,y):
+		self.x1 += x
+		self.x2 += x
+		self.y1 += y
+		self.y2 += y
 
 class rectang:
 	def __init__ (self,x,y,w,h,taille,couleur):
@@ -44,6 +91,28 @@ class rectang:
 		"""dessin"""
 		painter.create_rectangle(self.x,self.y,self.w,self.h,outline=self.couleur,width=self.taille)
 
+	def colision(self,xs,ys):
+		if self.taille < 5:
+			marge = 5
+		else:
+			marge = self.taille
+		x = self.x
+		y = self.y
+		w = self.w-x
+		h = self.h-y
+		if ((xs>=x-marge and xs<=x+marge and ys>=y-marge and ys<=y+h) or 
+		   (xs>=x-marge+w and xs<=x+marge+w and ys>=y-marge and ys<=y+h) or 
+		   (xs>=x-marge and xs<x+w+marge and ys>=y-marge and ys<=y+marge) or 
+		   (xs>=x-marge and xs<x+w+marge and ys>=y-marge+h and ys<=y+marge+h)):
+			return True
+		return False
+
+	def move(self,x,y):
+		self.x += x
+		self.w += x
+		self.y += y
+		self.h += y
+
 class circle:
 	def __init__ (self,x,y,w,h,taille,couleur):
 		self.x = x
@@ -61,6 +130,45 @@ class circle:
 	def dessiner(self,painter):
 		"""dessin"""
 		painter.create_oval(self.x,self.y,self.w,self.h,outline=self.couleur,width=self.taille)
+
+	def colision(self,xs,ys):
+		if self.taille < 8:
+			marge = 8
+		else:
+			marge = self.taille
+		x = self.x+marge/2
+		y = self.y+marge/2
+		w = self.w-marge/2
+		h = self.h-marge/2
+
+		mx = (1/2)*(x+w)
+		my = (1/2)*(y+h)
+		ox = (1/2)*abs((-x)+w)
+		oy = (1/2)*abs((-y)+h)
+
+		interne = ((xs-mx)**2)/ox**2 + ((ys-my)**2)/oy**2
+
+		x -= marge
+		y -= marge
+		w += marge
+		h += marge
+
+		mx = (1/2)*(x+w)
+		my = (1/2)*(y+h)
+		ox = (1/2)*abs((-x)+w)
+		oy = (1/2)*abs((-y)+h)
+
+		interne1 = ((xs-mx)**2)/ox**2 + ((ys-my)**2)/oy**2
+
+		if interne1 < 1 and not interne < 1:
+			return True
+		else:
+			return False
+	def move(self,x,y):
+		self.x += x
+		self.w += x
+		self.y += y
+		self.h += y
 
 class nuagePoint:
 	def __init__(self,x,y,couleur,taille):
@@ -94,7 +202,10 @@ class nuagePoint:
 				painter.create_oval(x-self.taille/2,y-self.taille/2,x+self.taille/2,y+self.taille/2,fill=self.couleur,outline=self.couleur)
 
 	def colision(self,xs,ys):
-		marge = 5
+		if self.taille < 5:
+			marge = 5
+		else:
+			marge = self.taille
 		x = 0
 		y = 0
 		for i,u in enumerate(self.listePoint):
