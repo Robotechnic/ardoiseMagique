@@ -146,6 +146,7 @@ class fenetre(Frame):
 	def setCouleur(self,couleur,y=0):
 		if couleur == "choix":
 			self.couleurDessin = askcolor()[1]
+			print(self.couleurDessin)
 			action = partial(self.setCouleur,self.couleurDessin)
 			self.boutonCouleurs[20+y].configure(background=self.couleurDessin,command=action)
 

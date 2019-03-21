@@ -1,4 +1,5 @@
 import math
+from functools import partial
 class point:
 	def __init__ (self,x,y,taille,couleur):
 		"""définition d'un point"""
@@ -24,14 +25,26 @@ class line:
 
 	def dessiner(self,painter):
 		"""dessin"""
-		painter.create_line(self.x1,self.y1,self.x2,self.y2,width=self.taille,fill=self.couleur)
+		painter.create_line(self.x1,self.y1,self.x2,self.y2,width=self.taille,fill=self.couleur,tag="test")
+
+	def getCercle(self):
+		"""retourne les coordonées pour la modification"""
+		return [self.x1,self.y1,self.x2,self.y2]
+
+	def setCercle(self,m,x,y):
+		if m == "1":
+			self.x1 = x
+			self.y1 = y
+		else:
+			self.x2 = x
+			self.y2 = y
 
 	def colision(self,x,y):
 		"""Verification des colision souris/ligne"""
 		if self.taille < 3:
 			rayon = 3
 		else:
-			rayon = self.taille
+			rayon = self.taille/2
 
 		ux = self.x2-self.x1
 		uy = self.y2-self.y1
@@ -57,14 +70,13 @@ class line:
 			if pscal1>=0 and pscal2>=0:
 				return True
 
-			d2 = (self.x1-x)*(self.x1-x) + (self.y1-y)*(self.y1-y)
-			if not (d2>rayon*rayon):
-				return True
+			# d2 = (self.x1-x)*(self.x1-x) + (self.y1-y)*(self.y1-y)
+			# if not (d2>rayon*rayon):
+			# 	return True
 
-			d2 = (self.x2-x)*(self.x2-x) + (self.y2-y)*(self.y2-y)
-			if not (d2>rayon*rayon):
-				return True
-
+			# d2 = (self.x2-x)*(self.x2-x) + (self.y2-y)*(self.y2-y)
+			# if not (d2>rayon*rayon):
+			# 	return True
 
 		return False
 	def move(self,x,y):
@@ -89,7 +101,20 @@ class rectang:
 
 	def dessiner(self,painter):
 		"""dessin"""
-		painter.create_rectangle(self.x,self.y,self.w,self.h,outline=self.couleur,width=self.taille)
+		painter.create_rectangle(self.x,self.y,self.w,self.h,outline=self.couleur,width=self.taille,tag="test")
+
+	def getCercle(self):
+		"""retourne les coordonées pour la modification"""
+		return [self.x,self.y,self.w,self.h]
+
+	def setCercle(self,m,x,y):
+		print("click",m)
+		if m == "1":
+			self.x = x
+			self.y = y
+		else:
+			self.w = x
+			self.h = y
 
 	def colision(self,xs,ys):
 		if self.taille < 5:
@@ -100,9 +125,9 @@ class rectang:
 		y = self.y
 		w = self.w-x
 		h = self.h-y
-		if ((xs>=x-marge and xs<=x+marge and ys>=y-marge and ys<=y+h) or 
-		   (xs>=x-marge+w and xs<=x+marge+w and ys>=y-marge and ys<=y+h) or 
-		   (xs>=x-marge and xs<x+w+marge and ys>=y-marge and ys<=y+marge) or 
+		if ((xs>=x-marge and xs<=x+marge and ys>=y-marge and ys<=y+h) or \
+		   (xs>=x-marge+w and xs<=x+marge+w and ys>=y-marge and ys<=y+h) or \
+		   (xs>=x-marge and xs<x+w+marge and ys>=y-marge and ys<=y+marge) or \
 		   (xs>=x-marge and xs<x+w+marge and ys>=y-marge+h and ys<=y+marge+h)):
 			return True
 		return False
@@ -129,7 +154,20 @@ class circle:
 
 	def dessiner(self,painter):
 		"""dessin"""
-		painter.create_oval(self.x,self.y,self.w,self.h,outline=self.couleur,width=self.taille)
+		painter.create_oval(self.x,self.y,self.w,self.h,outline=self.couleur,width=self.taille,tag="test")
+
+	def getCercle(self):
+		"""retourne les coordonées pour la modification"""
+		return [self.x,self.y,self.w,self.h]
+
+	def setCercle(self,m,x,y):
+		print(m)
+		if m == "1":
+			self.x = x
+			self.y = y
+		else:
+			self.w = x
+			self.h = y
 
 	def colision(self,xs,ys):
 		if self.taille < 8:
@@ -187,9 +225,9 @@ class nuagePoint:
 	def dessiner(self,painter):
 		"""dessin"""
 		if len(self.listePoint)>3:
-			painter.create_line(self.listePoint,fill=self.couleur,width=self.taille)
+			painter.create_line(self.listePoint,fill=self.couleur,width=self.taille,tag="test")
 		else:
-			painter.create_line(self.listePoint[0],self.listePoint[1],self.listePoint[0]+1,self.listePoint[1],fill=self.couleur,width=self.taille)
+			painter.create_line(self.listePoint[0],self.listePoint[1],self.listePoint[0]+1,self.listePoint[1],fill=self.couleur,width=self.taille,tag="test")
 
 		x = 0
 		y = 0
@@ -199,7 +237,14 @@ class nuagePoint:
 			else:
 				y = u
 
-				painter.create_oval(x-self.taille/2,y-self.taille/2,x+self.taille/2,y+self.taille/2,fill=self.couleur,outline=self.couleur)
+				painter.create_oval(x-self.taille/2,y-self.taille/2,x+self.taille/2,y+self.taille/2,fill=self.couleur,outline=self.couleur,tag="test")
+
+	def getCercle(self):
+		"""retourne les coordonées pour la modification mais ici ne sert a rien"""
+		return None
+
+	def setCercle(self,m,x,y):
+		print("problème")
 
 	def colision(self,xs,ys):
 		if self.taille < 5:
@@ -250,15 +295,25 @@ class zoneDessin:
 			self.elementEnCour = circle(x,y,x,y,taille,couleur)
 		elif self.type == "select":
 			#print("selection",self.listeElements[0].colision(x,y))
-			self.idSelect = -1
-			for i,obj in enumerate(self.listeElements):
-				if obj.colision(x,y):
-					self.idSelect = i
-					break
 
-			if self.idSelect>-1:
-				self.selectX = x
-				self.selectY = y
+			self.isCercle = True
+			if not len(painter.gettags("current")) == 4:
+				self.isCercle = False
+				self.idSelect = -1
+
+				liste = self.listeElements.copy()
+				liste.reverse()
+
+				for i,obj in enumerate(liste):
+					if obj.colision(x,y):
+						self.idSelect = len(self.listeElements)-i-1
+						break
+
+				if self.idSelect>-1:
+					self.selectX = x
+					self.selectY = y
+			else:
+				self.tag = painter.gettags("current")
 
 		self.paint(painter)
 		self.listeUndo.clear()
@@ -269,10 +324,13 @@ class zoneDessin:
 		elif self.type == "ajouter":
 			self.gomme.ajouter(x,y)
 		elif self.type == "select":
-			if self.idSelect>-1:
+			if not self.isCercle:
 				self.listeElements[self.idSelect].move(x-self.selectX,y-self.selectY)
 				self.selectX = x
 				self.selectY = y
+			else:
+				tags = self.tag
+				self.listeElements[int(tags[1])].setCercle(tags[2],x,y)
 		else:
 			self.elementEnCour.mouse(x,y)
 
@@ -285,6 +343,9 @@ class zoneDessin:
 		self.tailleGomme = taille
 		self.xm = x-taille/2
 		self.ym = y-taille/2
+
+		self.x = x
+		self.y = y
 		self.paint(painter)
 
 	def finNouveau(self,painter):
@@ -311,6 +372,7 @@ class zoneDessin:
 		self.paint(painter)
 
 	def paint(self,painter):
+		"""dessine touts les éléments contenus dans la liste"""
 		painter.delete("all")
 		for i in self.listeElements:
 			i.dessiner(painter)
@@ -319,11 +381,35 @@ class zoneDessin:
 		except AttributeError as e:
 			print("erreur dessin")
 
-		if not self.type in ["square","circle"]:
+		if not self.type in ["square","circle","select"]:
 			painter.create_oval(self.xm,self.ym,self.xm+self.tailleGomme,self.ym+self.tailleGomme,outline="black")
 
+		try:
+			if self.idSelect != -1 and self.type == "select":
+				co = self.listeElements[self.idSelect].getCercle()
+				if not co is None:
+					c1 = painter.create_oval(co[0]-3,co[1]-3,co[0]+6,co[1]+6,fill="white",outline="black",tag=("cercleMove",str(self.idSelect),"1"))
+					c2 = painter.create_oval(co[2]-3,co[3]-3,co[2]+6,co[3]+6,fill="white",outline="black",tag=("cercleMove",str(self.idSelect),"2"))
+
+					action = partial(self.moveCircleEnter,self,painter)
+					painter.tag_bind(c1,"<Any-Enter>",action)
+					painter.tag_bind(c2,"<Any-Enter>",action)
+
+					action = partial(self.moveCircleQuit,self,painter)
+					painter.tag_bind(c1,"<Any-Leave>",action)
+					painter.tag_bind(c2,"<Any-Leave>",action)
+		except AttributeError as e:
+			print("Pas encore set")
+		
+
+	def moveCircleEnter(evt,self,painter,delta):
+		painter.itemconfig("current", fill="#cef7f6")
+
+	def moveCircleQuit(evt,self,painter,delta):
+		painter.itemconfig("current", fill="white")
 
 	def changeMode(self,mode):
+		"""Sert a changer le mode de dessin """
 		self.type = mode
 		print("mode:",mode)
 
