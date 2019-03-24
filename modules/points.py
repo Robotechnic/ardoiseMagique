@@ -89,8 +89,8 @@ class rectang:
 	def __init__ (self,x,y,w,h,taille,couleur):
 		self.x = x
 		self.y = y
-		self.w = x+w
-		self.h = y+h
+		self.w = w
+		self.h = h
 		self.couleur = couleur
 		self.taille = taille
 
@@ -282,6 +282,7 @@ class zoneDessin:
 		self.type = "point"
 
 	def nouveau(self,x,y,couleur,taille,painter):
+		print(self.type)
 		if self.type == "point":
 			print("newPoint")
 			self.elementEnCour = nuagePoint(x,y,couleur,taille)
@@ -314,6 +315,9 @@ class zoneDessin:
 					self.selectY = y
 			else:
 				self.tag = painter.gettags("current")
+		self.tailleGomme = taille
+		self.xm = x-taille/2
+		self.ym = y-taille/2
 
 		self.paint(painter)
 		self.listeUndo.clear()
@@ -324,15 +328,19 @@ class zoneDessin:
 		elif self.type == "ajouter":
 			self.gomme.ajouter(x,y)
 		elif self.type == "select":
-			if not self.isCercle:
-				self.listeElements[self.idSelect].move(x-self.selectX,y-self.selectY)
-				self.selectX = x
-				self.selectY = y
-			else:
-				tags = self.tag
-				self.listeElements[int(tags[1])].setCercle(tags[2],x,y)
+			if self.idSelect>-1:
+				if not self.isCercle:
+					self.listeElements[self.idSelect].move(x-self.selectX,y-self.selectY)
+					self.selectX = x
+					self.selectY = y
+				else:
+					tags = self.tag
+					self.listeElements[int(tags[1])].setCercle(tags[2],x,y)
 		else:
-			self.elementEnCour.mouse(x,y)
+			try:
+				self.elementEnCour.mouse(x,y)
+			except AttributeError as e:
+				e = "je n'afiche rien car l'erreur est normale et sa met trop de logs"
 
 		self.xm = x-self.tailleGomme/2
 		self.ym = y-self.tailleGomme/2
@@ -352,6 +360,8 @@ class zoneDessin:
 		if self.type != "select":
 			self.listeElements.append(self.elementEnCour)
 			self.paint(painter)
+			self.elementEnCour = ""
+
 
 	def undo(self,painter):
 		try:
@@ -408,21 +418,21 @@ class zoneDessin:
 	def moveCircleQuit(evt,self,painter,delta):
 		painter.itemconfig("current", fill="white")
 
-	def changeMode(self,mode):
-		"""Sert a changer le mode de dessin """
-		self.type = mode
-		print("mode:",mode)
-
 	def clear(self):
 		self.listeUndo.append(self.listeElements.reverse())
+		self.elementEnCour = ""
 		self.listeElements.clear()
 
-	def __setstate__(self,dict):
+	def __setstate__(self,dicte):
 		"""Rechargement de l'objet serialisé"""
-		self.__dict__ = dict
+		self.__dict__ = dicte
 
 	def __getstate__ (self):
 		"""Sauvegarde de l'objet"""
-		liste =  self.__dict__.copy()
-		#print(liste)
-		return liste
+		return self.__dict__
+
+	def __repr__(self):
+		return "zone dessin:{}".format(self.__dict__)
+
+	def __str__(self):
+		return "zone dessin:{}".format(self.__dict__)
